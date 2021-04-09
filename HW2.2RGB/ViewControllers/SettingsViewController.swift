@@ -21,14 +21,9 @@ class SettingsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        rgbView.layer.cornerRadius = 15
         
-        setRedLabelValue()
-        setGreenLabelValue()
-        setBlueLabelValue()
-        
-        setRedLabelColor()
-        setGreenLabelColor()
-        setBlueLabelColor()
+        setValue(for: redLabel, greenLabel, blueLabel)
         
         viewBackgroundChanged()
     }
@@ -36,23 +31,11 @@ class SettingsViewController: UIViewController {
     
     @IBAction func sliderChangedColor(_ sender: UISlider) {
         
-        switch sender.tag {
-        case 0:
-            setRedLabelValue()
-            
-        case 1:
-            setGreenLabelValue()
-            
-        case 2:
-            setBlueLabelValue()
-            
-        default:
-            break
+        switch sender {
+        case redSlider: setValue(for: redLabel)
+        case greenSlider: setValue(for: greenLabel)
+        default: setValue(for: blueLabel)
         }
-        
-        setRedLabelColor()
-        setBlueLabelColor()
-        setGreenLabelColor()
         
         viewBackgroundChanged()
      
@@ -71,25 +54,7 @@ class SettingsViewController: UIViewController {
         blueLabel.text = String(format: "%.2f", blueSlider.value)
     }
     
-    // MARK: - Set Label Color
-    private func setRedLabelColor() {
-        redLabel.textColor = UIColor(red: CGFloat(redSlider.value),
-                                     green: 0,
-                                     blue: 0,
-                                     alpha: 1)
-    }
-    private func setGreenLabelColor() {
-        greenLabel.textColor = UIColor(red: 0,
-                                     green: CGFloat(greenSlider.value),
-                                     blue: 0,
-                                     alpha: 1)
-    }
-    private func setBlueLabelColor() {
-        blueLabel.textColor = UIColor(red: 0,
-                                     green: 0,
-                                     blue: CGFloat(blueSlider.value),
-                                     alpha: 1)
-    }
+ 
     
     // MARK: - Set View Background Color
     private func viewBackgroundChanged() {
@@ -97,6 +62,23 @@ class SettingsViewController: UIViewController {
                                           green: CGFloat(greenSlider.value),
                                           blue: CGFloat(blueSlider.value),
                                           alpha: 1)
+    }
+    
+    private func setValue(for labels: UILabel...) {
+        labels.forEach { label in
+            switch label {
+            case redLabel:
+                label.text = string(from: redSlider)
+            case greenLabel:
+                label.text = string(from: greenSlider)
+            default:
+                label.text = string(from: blueSlider)
+            }
+        }
+    }
+    
+    private func string(from slider: UISlider) -> String {
+        String(format: "%.2f", slider.value)
     }
 }
 
