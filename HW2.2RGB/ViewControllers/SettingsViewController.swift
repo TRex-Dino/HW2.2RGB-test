@@ -40,6 +40,7 @@ class SettingsViewController: UIViewController {
         updateView()
     }
     
+    //MARK: - IBActions
     @IBAction func sliderChangedColor(_ sender: UISlider) {
         
         switch sender {
@@ -57,6 +58,7 @@ class SettingsViewController: UIViewController {
         dismiss(animated: true)
     }
     
+    //MARK: - set text for labels
     private func setLabelText(for labels: UILabel...) {
         labels.forEach { label in
             switch label {
@@ -69,7 +71,7 @@ class SettingsViewController: UIViewController {
             }
         }
     }
-    
+    //MARK: - set text for textFields
     private func setTextField(for textFields: UITextField...) {
         textFields.forEach { textField in
             switch textField {
@@ -121,3 +123,71 @@ class SettingsViewController: UIViewController {
     }
 }
 
+//MARK: - work with keyboard
+extension SettingsViewController: UITextFieldDelegate {
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        view.endEditing(true)
+    }
+    
+    func textFieldDidBeginEditing (_ textField: UITextField) {
+        textField.selectAll(nil)
+        
+        let toolBar = UIToolbar()
+        toolBar.sizeToFit()
+        
+        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let button = UIBarButtonItem(
+            title: "Done",
+            style: .done,
+            target: textField,
+            action: #selector(resignFirstResponder)
+        )
+        
+        toolBar.items = [space, button]
+        
+        textField.inputAccessoryView = toolBar
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        guard let value = textField.text else { return }
+        guard let newValue = Float(value), newValue >= 0 && newValue <= 1  else {
+            showAlert(
+                title: "Wrong value!",
+                message: "Please. Enter value from 0.0 to 1.0",
+                textField: textField)
+            return }
+        
+        switch textField {
+        case redTextField:
+            redSlider.value = newValue
+            setTextField(for: textField)
+            setLabelText(for: redLabel)
+        case greenTextField:
+            greenSlider.value = newValue
+            setTextField(for: textField)
+            setLabelText(for: greenLabel)
+        default:
+            blueSlider.value = newValue
+            setTextField(for: textField)
+            setLabelText(for: blueLabel)
+        }
+        
+        updateColor()
+        updateRGBView()
+    }
+    
+}
+
+//MARK: - alertController
+extension SettingsViewController {
+    private func showAlert(title: String, message: String, textField: UITextField) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel) { _ in
+            self.setTextField(for: textField)
+        }
+        alert.addAction(okAction)
+        present(alert, animated: true)
+    }
+}

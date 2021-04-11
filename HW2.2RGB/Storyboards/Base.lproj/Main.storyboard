@@ -54,6 +54,9 @@
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="BYZ-38-t0r" id="nTQ-Y2-FnB"/>
+                                                </connections>
                                             </textField>
                                         </subviews>
                                     </stackView>
@@ -92,6 +95,9 @@
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="BYZ-38-t0r" id="ftU-ek-uWC"/>
+                                                </connections>
                                             </textField>
                                         </subviews>
                                     </stackView>
@@ -130,6 +136,9 @@
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Fgo-H1-S0g"/>
+                                                </connections>
                                             </textField>
                                         </subviews>
                                     </stackView>
