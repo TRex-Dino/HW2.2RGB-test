@@ -26,18 +26,14 @@ class SettingsViewController: UIViewController {
     var color: UIColor!
     var delegate: SettingsViewControllerDelegate!
     
-    private var colorComponent: (red: Float, green: Float, blue: Float) {
-        (red: Float(color.cgColor.components?[0] ?? 1),
-         green: Float(color.cgColor.components?[1] ?? 1),
-         blue: Float(color.cgColor.components?[2] ?? 1)
-        )
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         rgbView.layer.cornerRadius = 15
         
-        updateView()
+        setSliders()
+        setLabelText(for: redLabel, blueLabel, greenLabel)
+        setTextField(for: redTextField, blueTextField, greenTextField)
+        
     }
     
     //MARK: - IBActions
@@ -50,14 +46,20 @@ class SettingsViewController: UIViewController {
         }
         
         updateRGBView()
-        updateColor()
     }
     
     @IBAction func doneButtonPressed() {
-        delegate.setNewColor(for: color)
+        delegate.setNewColor(rgbView.backgroundColor ?? .white)
         dismiss(animated: true)
     }
     
+    private func setSliders() {
+        let ciColor = CIColor(color: color)
+        
+        redSlider.value = Float(ciColor.red)
+        greenSlider.value = Float(ciColor.green)
+        blueSlider.value = Float(ciColor.blue)
+    }
     //MARK: - set text for labels
     private func setLabelText(for labels: UILabel...) {
         labels.forEach { label in
@@ -85,41 +87,17 @@ class SettingsViewController: UIViewController {
         }
     }
     
-    //MARK: - round value
-    private func roundValue(value: Float) -> Float {
-        round(value * 100) / 100
-    }
     private func string(from slider: UISlider) -> String {
         String(format: "%.2f", slider.value)
     }
     
     // MARK: - Set View Background Color
     private func updateRGBView() {
-        rgbView.backgroundColor = color
-    }
-    
-    //MARK: - Update screen view
-    private func updateView() {
-        redSlider.value = colorComponent.red
-        greenSlider.value = colorComponent.green
-        blueSlider.value = colorComponent.blue
-
-        redLabel.text = String(colorComponent.red)
-        greenLabel.text = String(colorComponent.green)
-        blueLabel.text = String(colorComponent.blue)
-
-        redTextField.text = redLabel.text
-        greenTextField.text = greenLabel.text
-        blueTextField.text = blueLabel.text
-
-        updateRGBView()
-    }
-    //MARK: - change value of color
-    private func updateColor() {
-        color = UIColor(red: CGFloat(roundValue(value: redSlider.value)),
-                         green: CGFloat(roundValue(value: greenSlider.value)),
-                         blue: CGFloat(roundValue(value: blueSlider.value)),
-                         alpha: 1)
+        rgbView.backgroundColor = UIColor(
+            red: CGFloat(redSlider.value),
+            green: CGFloat(greenSlider.value),
+            blue: CGFloat(blueSlider.value),
+            alpha: 1)
     }
 }
 
@@ -132,7 +110,6 @@ extension SettingsViewController: UITextFieldDelegate {
     }
     
     func textFieldDidBeginEditing (_ textField: UITextField) {
-        textField.selectAll(nil)
         
         let toolBar = UIToolbar()
         toolBar.sizeToFit()
@@ -174,7 +151,6 @@ extension SettingsViewController: UITextFieldDelegate {
             setLabelText(for: blueLabel)
         }
         
-        updateColor()
         updateRGBView()
     }
     
