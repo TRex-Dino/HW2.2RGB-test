@@ -30,6 +30,8 @@ class SettingsViewController: UIViewController {
         super.viewDidLoad()
         rgbView.layer.cornerRadius = 15
         
+        rgbView.backgroundColor = color
+        
         setSliders()
         setLabelText(for: redLabel, blueLabel, greenLabel)
         setTextField(for: redTextField, blueTextField, greenTextField)
@@ -101,7 +103,7 @@ class SettingsViewController: UIViewController {
     }
 }
 
-//MARK: - work with keyboard
+// MARK: - UITextFieldDelegate
 extension SettingsViewController: UITextFieldDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -109,51 +111,50 @@ extension SettingsViewController: UITextFieldDelegate {
         view.endEditing(true)
     }
     
-    func textFieldDidBeginEditing (_ textField: UITextField) {
-        
-        let toolBar = UIToolbar()
-        toolBar.sizeToFit()
-        
-        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let button = UIBarButtonItem(
-            title: "Done",
-            style: .done,
-            target: textField,
-            action: #selector(resignFirstResponder)
-        )
-        
-        toolBar.items = [space, button]
-        
-        textField.inputAccessoryView = toolBar
-    }
-    
     func textFieldDidEndEditing(_ textField: UITextField) {
-        guard let value = textField.text else { return }
-        guard let newValue = Float(value), newValue >= 0 && newValue <= 1  else {
-            showAlert(
-                title: "Wrong value!",
-                message: "Please. Enter value from 0.0 to 1.0",
-                textField: textField)
-            return }
         
-        switch textField {
-        case redTextField:
-            redSlider.value = newValue
-            setTextField(for: textField)
-            setLabelText(for: redLabel)
-        case greenTextField:
-            greenSlider.value = newValue
-            setTextField(for: textField)
-            setLabelText(for: greenLabel)
-        default:
-            blueSlider.value = newValue
-            setTextField(for: textField)
-            setLabelText(for: blueLabel)
+        guard let text = textField.text else { return }
+        
+        if let currentValue = Float(text) {
+            switch textField {
+            case redTextField:
+                redSlider.setValue(currentValue, animated: true)
+                setLabelText(for: redLabel)
+            case greenTextField:
+                greenSlider.setValue(currentValue, animated: true)
+                setLabelText(for: greenLabel)
+            default:
+                blueSlider.setValue(currentValue, animated: true)
+                setLabelText(for: blueLabel)
+            }
+            
+            updateRGBView()
+            return
         }
         
-        updateRGBView()
+        showAlert(title: "Wrong format!", message: "Please enter correct value", textField: textField)
     }
     
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        let keyboardToolbar = UIToolbar()
+        textField.inputAccessoryView = keyboardToolbar
+        keyboardToolbar.sizeToFit()
+        
+        let doneButton = UIBarButtonItem(
+            title:"Done",
+            style: .done,
+            target: self,
+            action: #selector(didTapDone)
+        )
+        
+        let flexBarButton = UIBarButtonItem(
+            barButtonSystemItem: .flexibleSpace,
+            target: nil,
+            action: nil
+        )
+        
+        keyboardToolbar.items = [flexBarButton, doneButton]
+    }
 }
 
 //MARK: - alertController
@@ -161,9 +162,14 @@ extension SettingsViewController {
     private func showAlert(title: String, message: String, textField: UITextField) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .cancel) { _ in
+            //
             self.setTextField(for: textField)
         }
         alert.addAction(okAction)
         present(alert, animated: true)
+    }
+    
+    @objc private func didTapDone() {
+        view.endEditing(true)
     }
 }
