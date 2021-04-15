@@ -21,6 +21,7 @@ class MainViewController: UIViewController {
     }
 
 }
+//check
 
 extension MainViewController: SettingsViewControllerDelegate {
     func setNewColor(_ color: UIColor) {
